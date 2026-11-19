@@ -22,6 +22,7 @@ kotlin {
 dependencies {
     api(project(":design"))
     api(project(":chatcore"))
+    api(project(":modelcatalog"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)

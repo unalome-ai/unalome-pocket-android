@@ -3,6 +3,7 @@ package ai.unalome.pocket.chatcore.data
 import ai.unalome.pocket.chatcore.ChatRole
 import ai.unalome.pocket.chatcore.Conversation
 import ai.unalome.pocket.chatcore.Message
+import ai.unalome.pocket.chatcore.Persona
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -49,6 +50,19 @@ data class MessageEntity(
     val createdAt: Long,
 )
 
+@Entity(tableName = "personas")
+data class PersonaEntity(
+    @PrimaryKey val id: String,
+    val name: String,
+    val systemPrompt: String,
+    val temperature: Double,
+    val defaultModelId: String?,
+    val isBuiltIn: Boolean,
+    val position: Int,
+    val createdAt: Long,
+    val updatedAt: Long,
+)
+
 class Converters {
     @TypeConverter
     fun roleToString(role: ChatRole): String = role.name
@@ -86,4 +100,14 @@ fun Message.toEntity() = MessageEntity(
     reasoningMillis = reasoningMillis, stoppedAtLengthLimit = stoppedAtLengthLimit,
     wasInterrupted = wasInterrupted, attachmentNames = attachmentNames, modelName = modelName,
     tokensPerSecond = tokensPerSecond, position = position, createdAt = createdAt,
+)
+
+fun PersonaEntity.toModel() = Persona(
+    id = id, name = name, systemPrompt = systemPrompt, temperature = temperature, defaultModelId = defaultModelId,
+    isBuiltIn = isBuiltIn, position = position, createdAt = createdAt, updatedAt = updatedAt,
+)
+
+fun Persona.toEntity() = PersonaEntity(
+    id = id, name = name, systemPrompt = systemPrompt, temperature = temperature, defaultModelId = defaultModelId,
+    isBuiltIn = isBuiltIn, position = position, createdAt = createdAt, updatedAt = updatedAt,
 )

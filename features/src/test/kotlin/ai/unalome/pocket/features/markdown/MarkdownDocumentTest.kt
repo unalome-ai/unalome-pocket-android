@@ -43,6 +43,17 @@ class MarkdownDocumentTest {
     }
 
     @Test
+    fun nestedItemsIndentedByFourSpacesAreKept() {
+        // As Gemma 4 writes them: a label item, then four-space sub-items.
+        val text = "* **Symbols:**\n    * On the left, a **red apple**.\n    * On the right, a **yellow star**.\n* **Text:** CAT 42"
+        val list = MarkdownDocument.parse(text).blocks.single() as ListBlock
+        assertEquals(2, list.items.size)
+        val inner = list.items[0].filterIsInstance<ListBlock>().single()
+        assertEquals(2, inner.items.size)
+        assertEquals(Paragraph("On the left, a **red apple**."), inner.items[0].single())
+    }
+
+    @Test
     fun streamingPrefixesNeverChangeEarlierBlocks() {
         // Every prefix of a reply parses to blocks whose finished ones match the full parse.
         for (script in ScriptedEngine.DEFAULT_SCRIPTS) {

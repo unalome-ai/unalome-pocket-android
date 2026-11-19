@@ -66,6 +66,7 @@ fun ConversationsScreen(
     onOpen: (String) -> Unit,
     onNewChat: () -> Unit,
     onOpenSettings: () -> Unit,
+    onOpenModels: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val conversations by viewModel.conversations.collectAsStateWithLifecycle()
@@ -78,6 +79,8 @@ fun ConversationsScreen(
             UnalomeMark(height = 26.dp)
             Spacer(Modifier.width(12.dp))
             Text("Chats", Modifier.weight(1f).semantics { heading() }, style = UnalomeType.Title, color = UnalomeColor.TextPrimary)
+            GlassIconButton(UnalomeIcons.Models, "Models", onOpenModels)
+            Spacer(Modifier.width(10.dp))
             GlassIconButton(UnalomeIcons.Info, "About and privacy", onOpenSettings)
             Spacer(Modifier.width(10.dp))
             GlassIconButton(UnalomeIcons.NewChat, "New chat", onNewChat, tint = UnalomeColor.GradientStart)

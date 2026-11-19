@@ -1,0 +1,168 @@
+{
+  "version": 1,
+  "models": [
+    {
+      "id": "qwen3.5-0.8b-q4_k_m",
+      "displayName": "Qwen 3.5 0.8B",
+      "repo": "unsloth/Qwen3.5-0.8B-GGUF",
+      "file": "Qwen3.5-0.8B-Q4_K_M.gguf",
+      "revision": "6ab461498e2023f6e3c1baea90a8f0fe38ab64d0",
+      "downloadSizeBytes": 532517120,
+      "sha256": "bd258782e35f7f458f8aced1adc053e6e92e89bc735ba3be89d38a06121dc517",
+      "projector": {
+        "file": "mmproj-F16.gguf",
+        "sizeBytes": 204987232,
+        "sha256": "56e4c6cfe73b0c82e3e82bc518d7591997e61d81f723fc41a586f4fa69ea2453"
+      },
+      "minimumMemoryBytes": 3221225472,
+      "recommendedMemoryBytes": 4294967296,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-0.8B/blob/main/LICENSE"
+      },
+      "goodFor": "Quick answers on any supported phone. The smallest and fastest.",
+      "qualityRank": 1
+    },
+    {
+      "id": "gemma-3-1b-it-q4_k_m",
+      "displayName": "Gemma 3 1B",
+      "repo": "ggml-org/gemma-3-1b-it-GGUF",
+      "file": "gemma-3-1b-it-Q4_K_M.gguf",
+      "revision": "f9c28bcd85737ffc5aef028638d3341d49869c27",
+      "downloadSizeBytes": 806058240,
+      "sha256": "8ccc5cd1f1b3602548715ae25a66ed73fd5dc68a210412eea643eb20eb75a135",
+      "minimumMemoryBytes": 4294967296,
+      "recommendedMemoryBytes": 6442450944,
+      "supportsVision": false,
+      "supportsThinking": false,
+      "license": {
+        "name": "Gemma Terms of Use",
+        "url": "https://ai.google.dev/gemma/terms"
+      },
+      "goodFor": "Short everyday questions and rewording text.",
+      "qualityRank": 2
+    },
+    {
+      "id": "qwen3.5-2b-q4_k_m",
+      "displayName": "Qwen 3.5 2B",
+      "repo": "unsloth/Qwen3.5-2B-GGUF",
+      "file": "Qwen3.5-2B-Q4_K_M.gguf",
+      "revision": "f6d5376be1edb4d416d56da11e5397a961aca8ae",
+      "downloadSizeBytes": 1280835840,
+      "sha256": "aaf42c8b7c3cab2bf3d69c355048d4a0ee9973d48f16c731c0520ee914699223",
+      "projector": {
+        "file": "mmproj-F16.gguf",
+        "sizeBytes": 668227264,
+        "sha256": "7035e9cb8d7c6a9681d07eef9a364783e86ea4cd73faab2eabb4f43a101830c7"
+      },
+      "minimumMemoryBytes": 6442450944,
+      "recommendedMemoryBytes": 8589934592,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-2B/blob/main/LICENSE"
+      },
+      "goodFor": "Better reasoning than the small models, still quick.",
+      "qualityRank": 4
+    },
+    {
+      "id": "gemma-4-e2b-it-q4_0",
+      "displayName": "Gemma 4 E2B",
+      "repo": "ggml-org/gemma-4-E2B-it-GGUF",
+      "file": "gemma-4-E2B-it-Q4_0.gguf",
+      "revision": "2a8538c2e2d4687953a86c422c7c623cfd022880",
+      "downloadSizeBytes": 2841481184,
+      "sha256": "8e30dff3ac4c8434c49a7036fa15564bdbb6044e42bf04550bf1a096ad7e6a52",
+      "projector": {
+        "file": "mmproj-gemma-4-E2B-it-Q8_0.gguf",
+        "sizeBytes": 557368096,
+        "sha256": "042cc2561806cd3b5cb5efb25cab76911e3100c43cc09d854904f921924b1429"
+      },
+      "minimumMemoryBytes": 8589934592,
+      "recommendedMemoryBytes": 12884901888,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://ai.google.dev/gemma/apache_2"
+      },
+      "goodFor": "Balanced everyday chat with good writing quality.",
+      "qualityRank": 5
+    },
+    {
+      "id": "qwen3.5-4b-q4_k_m",
+      "displayName": "Qwen 3.5 4B",
+      "repo": "unsloth/Qwen3.5-4B-GGUF",
+      "file": "Qwen3.5-4B-Q4_K_M.gguf",
+      "revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+      "downloadSizeBytes": 2740937888,
+      "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+      "projector": {
+        "file": "mmproj-F16.gguf",
+        "sizeBytes": 672423616,
+        "sha256": "cd88edcf8d031894960bb0c9c5b9b7e1fea6ebee02b9f7ce925a00d12891f864"
+      },
+      "minimumMemoryBytes": 8589934592,
+      "recommendedMemoryBytes": 12884901888,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-4B/blob/main/LICENSE"
+      },
+      "goodFor": "Stronger reasoning and longer answers.",
+      "qualityRank": 6
+    },
+    {
+      "id": "gemma-4-e4b-it-q4_0",
+      "displayName": "Gemma 4 E4B",
+      "repo": "ggml-org/gemma-4-E4B-it-GGUF",
+      "file": "gemma-4-E4B-it-Q4_0.gguf",
+      "revision": "8903cb408c7df39cde2ed15fac397e6d7be92951",
+      "downloadSizeBytes": 4590807392,
+      "sha256": "a555b900214b477d8880e7832e0b8925e139b0159640036b09fe472b6f2097f2",
+      "projector": {
+        "file": "mmproj-gemma-4-E4B-it-Q8_0.gguf",
+        "sizeBytes": 559874848,
+        "sha256": "9257f21a0f5358204b4a612cff83fad2e56412f4f607f0049331ce60c0cf9d34"
+      },
+      "minimumMemoryBytes": 12884901888,
+      "recommendedMemoryBytes": 17179869184,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://ai.google.dev/gemma/apache_2"
+      },
+      "goodFor": "Higher-quality answers on phones with 12 GB of memory or more.",
+      "qualityRank": 7
+    },
+    {
+      "id": "qwen3.5-9b-q4_k_m",
+      "displayName": "Qwen 3.5 9B",
+      "repo": "unsloth/Qwen3.5-9B-GGUF",
+      "file": "Qwen3.5-9B-Q4_K_M.gguf",
+      "revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+      "downloadSizeBytes": 5680522464,
+      "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+      "projector": {
+        "file": "mmproj-F16.gguf",
+        "sizeBytes": 918166080,
+        "sha256": "f70dc3509053962b0d0d3ee8a7eacebf5d60aa560cad78254ae8698516ae029f"
+      },
+      "minimumMemoryBytes": 17179869184,
+      "recommendedMemoryBytes": 25769803776,
+      "supportsVision": true,
+      "supportsThinking": true,
+      "license": {
+        "name": "Apache 2.0",
+        "url": "https://huggingface.co/Qwen/Qwen3.5-9B/blob/main/LICENSE"
+      },
+      "goodFor": "The best answers here, for phones with 16 GB of memory.",
+      "qualityRank": 8
+    }
+  ]
+}

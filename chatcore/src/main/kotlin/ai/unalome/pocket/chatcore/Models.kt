@@ -35,13 +35,17 @@ data class Message(
     val stoppedAtLengthLimit: Boolean = false,
     /** The reply ended early (stopped, interrupted or failed); the text so far is kept. */
     val wasInterrupted: Boolean = false,
-    /** Attached files, as names in a future attachment store. */
+    /** Attached images, as file names in the [AttachmentStore]. */
     val attachmentNames: List<String> = emptyList(),
     /** Engine or model that wrote this reply (assistant messages). */
     val modelName: String? = null,
     /** Decode speed of this reply (assistant messages). */
     val tokensPerSecond: Double? = null,
 ) {
-    /** What the engine sees: the text only. Reasoning stays out of the history. */
-    val turn: ChatTurn get() = ChatTurn(role, text, attachmentNames)
+    /**
+     * What the engine sees: the text, and the attached images as paths that [resolve] gives for
+     * their names. Reasoning stays out of the history.
+     */
+    fun turn(resolve: (List<String>) -> List<String> = { emptyList() }): ChatTurn =
+        ChatTurn(role, text, if (attachmentNames.isEmpty()) emptyList() else resolve(attachmentNames))
 }

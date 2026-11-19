@@ -8,6 +8,8 @@ import kotlinx.coroutines.flow.Flow
  */
 class ConversationStore(
     private val repository: ConversationRepository,
+    /** Where messages' attached files live; they are deleted with their messages. */
+    private val attachments: AttachmentFiles? = null,
     private val now: () -> Long = System::currentTimeMillis,
 ) {
     fun conversations(query: String = ""): Flow<List<Conversation>> = repository.observeConversations(query)
@@ -15,8 +17,8 @@ class ConversationStore(
     suspend fun conversation(id: String): Conversation? = repository.conversation(id)
     suspend fun messages(conversationId: String): List<Message> = repository.messages(conversationId)
 
-    suspend fun createConversation(): Conversation {
-        val conversation = Conversation(createdAt = now())
+    suspend fun createConversation(personaId: String? = null): Conversation {
+        val conversation = Conversation(createdAt = now(), personaId = personaId)
         repository.insert(conversation)
         return conversation
     }
@@ -36,7 +38,17 @@ class ConversationStore(
         repository.update(conversation.copy(isThinkingEnabled = enabled))
     }
 
-    suspend fun delete(conversationId: String) = repository.deleteConversation(conversationId)
+    suspend fun setPersona(conversationId: String, personaId: String?) {
+        val conversation = repository.conversation(conversationId) ?: return
+        repository.update(conversation.copy(personaId = personaId))
+    }
+
+    /** Deletes a conversation, its messages and their attached files. */
+    suspend fun delete(conversationId: String) {
+        val names = repository.messages(conversationId).flatMap { it.attachmentNames }
+        repository.deleteConversation(conversationId)
+        attachments?.delete(names)
+    }
 
     /**
      * Appends a message after the existing ones. The first user message of a conversation with an
@@ -74,8 +86,14 @@ class ConversationStore(
         repository.conversation(message.conversationId)?.let { repository.update(it.copy(updatedAt = now())) }
     }
 
-    /** Removes messages, e.g. a reply that is about to be regenerated. */
-    suspend fun deleteMessages(messages: List<Message>) = repository.deleteMessages(messages.map { it.id })
+    /**
+     * Removes messages, e.g. a reply that is about to be regenerated, and their attached files
+     * unless [keepAttachments] (a message edited and sent again reuses them).
+     */
+    suspend fun deleteMessages(messages: List<Message>, keepAttachments: Boolean = false) {
+        repository.deleteMessages(messages.map { it.id })
+        if (!keepAttachments) attachments?.delete(messages.flatMap { it.attachmentNames })
+    }
 
     companion object {
         /** The first line of [text], trimmed and cut at a word boundary to at most [maxLength] characters. */

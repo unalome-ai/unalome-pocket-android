@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Unalome Pocket</string>
+    <string name="shortcut_new_chat">New chat</string>
+    <string name="shortcut_new_chat_long">Start a new chat</string>
 </resources>

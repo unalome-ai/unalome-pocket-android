@@ -10,6 +10,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.Update
+import androidx.room.Upsert
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -64,17 +67,53 @@ interface MessageDao {
     suspend fun deleteIds(ids: List<String>)
 }
 
-@Database(entities = [ConversationEntity::class, MessageEntity::class], version = 1, exportSchema = true)
+@Dao
+interface PersonaDao {
+    @Query("SELECT * FROM personas")
+    fun observeAll(): Flow<List<PersonaEntity>>
+
+    @Query("SELECT * FROM personas")
+    suspend fun all(): List<PersonaEntity>
+
+    @Query("SELECT * FROM personas WHERE id = :id")
+    suspend fun get(id: String): PersonaEntity?
+
+    @Upsert
+    suspend fun upsert(persona: PersonaEntity)
+
+    @Query("DELETE FROM personas WHERE id = :id")
+    suspend fun delete(id: String)
+}
+
+@Database(
+    entities = [ConversationEntity::class, MessageEntity::class, PersonaEntity::class],
+    version = 2,
+    exportSchema = true,
+)
 @TypeConverters(Converters::class)
 abstract class PocketDatabase : RoomDatabase() {
     abstract fun conversations(): ConversationDao
     abstract fun messages(): MessageDao
+    abstract fun personas(): PersonaDao
 
     companion object {
         fun open(context: Context): PocketDatabase =
-            Room.databaseBuilder(context, PocketDatabase::class.java, "pocket.db").build()
+            Room.databaseBuilder(context, PocketDatabase::class.java, "pocket.db").addMigrations(*MIGRATIONS).build()
 
         fun inMemory(context: Context): PocketDatabase =
             Room.inMemoryDatabaseBuilder(context, PocketDatabase::class.java).allowMainThreadQueries().build()
+
+        /** Version 2 adds personas. Chats already had a `personaId` column, so nothing else changes. */
+        val MIGRATION_1_2 = object : Migration(1, 2) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "CREATE TABLE IF NOT EXISTS `personas` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `systemPrompt` TEXT NOT NULL, " +
+                        "`temperature` REAL NOT NULL, `defaultModelId` TEXT, `isBuiltIn` INTEGER NOT NULL, `position` INTEGER NOT NULL, " +
+                        "`createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+                )
+            }
+        }
+
+        val MIGRATIONS = arrayOf(MIGRATION_1_2)
     }
 }

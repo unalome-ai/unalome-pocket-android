@@ -1,6 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- No INTERNET permission: this milestone runs a scripted engine fully offline. -->
+<!--
+  Network: only model downloads from huggingface.co, started by the user. Cleartext traffic is off
+  (the default for this target SDK) and the downloader refuses anything but HTTPS to Hugging Face.
+-->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Keeps a model download running when the app is in the background. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+    <!-- Download progress notification; asked at the first download, downloads work without it. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Voice input: asked at the first tap on the microphone. Speech is recognised on the phone
+         only (SpeechRecognizer.createOnDeviceSpeechRecognizer); audio is never sent anywhere. -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+
+    <!-- The on-device speech recogniser is a service of another package; Android 11+ needs this to see it. -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+        <!-- The camera app that takes a photo for the chat. The app itself has no camera permission. -->
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE" />
+        </intent>
+    </queries>
 
     <application
         android:name=".PocketApplication"
@@ -10,17 +34,36 @@
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:usesCleartextTraffic="false"
         android:supportsRtl="true"
         android:theme="@style/Theme.UnalomePocket">
 
         <activity
             android:name=".MainActivity"
             android:exported="true"
+            android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- Images shared from another app open a new chat with them attached. -->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <action android:name="android.intent.action.SEND_MULTIPLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+            </intent-filter>
+            <meta-data android:name="android.app.shortcuts" android:resource="@xml/shortcuts" />
         </activity>
+
+        <!-- Lends the camera app one app-private file to write a photo into, for the chat. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
     </application>
 </manifest>

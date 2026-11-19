@@ -103,3 +103,12 @@ class InMemoryConversationRepository : ConversationRepository {
         synchronized(this) { state.value = change(state.value) }
     }
 }
+
+class RoomPersonaRepository(database: PocketDatabase) : PersonaRepository {
+    private val personas = database.personas()
+    override fun observeAll() = personas.observeAll().map { list -> list.map { it.toModel() } }
+    override suspend fun all() = personas.all().map { it.toModel() }
+    override suspend fun get(id: String) = personas.get(id)?.toModel()
+    override suspend fun upsert(persona: Persona) = personas.upsert(persona.toEntity())
+    override suspend fun delete(id: String) = personas.delete(id)
+}

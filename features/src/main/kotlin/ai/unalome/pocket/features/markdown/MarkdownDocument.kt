@@ -151,6 +151,9 @@ private class BlockParser(private val lines: List<String>) {
         val first = lines[index]
         val ordered = !BULLET.matches(first)
         val start = if (ordered) ORDERED.find(first)!!.groupValues[2].toInt() else 1
+        // Items sit at the first item's indent (a nested list's lines keep up to 3 spaces of it);
+        // markers indented further belong to a list inside the item.
+        val baseIndent = (if (ordered) ORDERED else BULLET).find(first)!!.groupValues[1].length
         val items = mutableListOf<List<String>>()
         var current: MutableList<String>? = null
         var contentIndent = 0
@@ -159,7 +162,7 @@ private class BlockParser(private val lines: List<String>) {
             val line = lines[index]
             val marker = (if (ordered) ORDERED else BULLET).find(line)
             when {
-                marker != null && marker.groupValues[1].length < 2 -> {
+                marker != null && marker.groupValues[1].length < baseIndent + 2 -> {
                     current = mutableListOf(marker.groupValues[3])
                     items += current
                     contentIndent = line.length - marker.groupValues[3].length

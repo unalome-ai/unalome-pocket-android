@@ -13,6 +13,8 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
     testOptions { unitTests.isIncludeAndroidResources = true }
+    // The exported schemas, for the migration tests.
+    sourceSets["test"].assets.directories.add("$projectDir/schemas")
 }
 
 kotlin {
@@ -34,4 +36,5 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.test.core)
+    testImplementation(libs.room.testing)
 }

@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "unalome-pocket-android"
 
-include(":app", ":design", ":chatcore", ":features")
+include(":app", ":design", ":chatcore", ":features", ":llamaengine", ":modelcatalog")
