@@ -120,6 +120,10 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -532,44 +536,85 @@ private fun ChatTopBar(
 @Composable
 private fun MessageList(state: ChatUiState, viewModel: ChatViewModel, context: Context) {
     val listState = rememberLazyListState()
+    val density = LocalDensity.current
     val lastAssistantId = state.messages.lastOrNull { it.role == ChatRole.ASSISTANT }?.id
     val lastUserId = state.lastUserMessage?.id
-    // Reverse layout keeps the newest content anchored to the bottom while a reply grows.
+    val lastUserIndex = state.messages.indexOfLast { it.role == ChatRole.USER }
+
+    // The reply grows downwards under a still question; the list never follows it, so text being
+    // read does not move. A spacer below the last turn fills the rest of the screen, which lets the
+    // question sit at the top; it shrinks by exactly what the reply gains, until the reply is longer
+    // than the screen and simply continues below.
+    val heights = remember { mutableStateMapOf<String, Int>() }
+    val itemGap = 24.dp
+    val edgePadding = 16.dp
+    val spacerHeight by remember(lastUserIndex, state.messages.size) {
+        derivedStateOf {
+            val viewport = listState.layoutInfo.viewportSize.height
+            if (viewport == 0 || lastUserIndex < 0) return@derivedStateOf 0.dp
+            val turnIds = state.messages.drop(lastUserIndex).map { it.id } + NOTICE_KEY
+            val turn = turnIds.sumOf { heights[it] ?: 0 }
+            val fixed = with(density) { (itemGap * turnIds.size + edgePadding * 2).roundToPx() }
+            with(density) { (viewport - turn - fixed).coerceAtLeast(0).toDp() }
+        }
+    }
+
     LazyColumn(
         Modifier.fillMaxSize(),
         state = listState,
-        reverseLayout = true,
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp, Alignment.Bottom),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = edgePadding),
+        verticalArrangement = Arrangement.spacedBy(itemGap),
     ) {
-        item(key = "notice") { AINotice() }
-        items(state.messages.asReversed(), key = { it.id }) { message ->
+        items(state.messages, key = { it.id }) { message ->
+            val measured = Modifier.onSizeChanged { heights[message.id] = it.height }
             if (message.role == ChatRole.USER) {
-                Column(horizontalAlignment = Alignment.End, modifier = Modifier.fillMaxWidth()) {
+                Column(horizontalAlignment = Alignment.End, modifier = measured.fillMaxWidth()) {
                     if (message.attachmentNames.isNotEmpty()) {
                         MessageImages(message.attachmentNames, viewModel::imagePath, Modifier.padding(start = 48.dp, bottom = 6.dp))
                     }
                     UserBubble(message.text)
-                    if (message.id == lastUserId && !state.isGenerating && state.editingMessageId == null) {
-                        ActionIcon(UnalomeIcons.Edit, "Edit and resend", viewModel::editLastMessage)
+                    if (message.id == lastUserId) {
+                        // The space is kept while a reply is written, so the reply below does not
+                        // shift when the button appears.
+                        if (!state.isGenerating && state.editingMessageId == null) {
+                            ActionIcon(UnalomeIcons.Edit, "Edit and resend", viewModel::editLastMessage)
+                        } else {
+                            Spacer(Modifier.size(44.dp))
+                        }
                     }
                 }
             } else {
                 val previousUser = state.messages.lastOrNull { it.role == ChatRole.USER && it.position < message.position }
-                AssistantMessage(
-                    message = message,
-                    isStreaming = message.id == state.streamingMessageId,
-                    reasoningStartedAt = state.reasoningStartedAt,
-                    canRegenerate = message.id == lastAssistantId && state.canRegenerate,
-                    onRegenerate = viewModel::regenerate,
-                    onReport = { reportResponse(context, previousUser?.text, message, viewModel.engineName) },
-                )
+                Box(measured) {
+                    AssistantMessage(
+                        message = message,
+                        isStreaming = message.id == state.streamingMessageId,
+                        reasoningStartedAt = state.reasoningStartedAt,
+                        canRegenerate = message.id == lastAssistantId && state.canRegenerate,
+                        onRegenerate = viewModel::regenerate,
+                        onReport = { reportResponse(context, previousUser?.text, message, viewModel.engineName) },
+                    )
+                }
             }
         }
+        item(key = NOTICE_KEY) { Box(Modifier.onSizeChanged { heights[NOTICE_KEY] = it.height }) { AINotice() } }
+        item(key = "end-space") { Spacer(Modifier.height(spacerHeight)) }
     }
-    // A new message scrolls back to the bottom.
-    LaunchedEffect(state.messages.size) { listState.animateScrollToItem(0) }
+
+    // Opening a chat shows its end; a new question is brought to the top and then left alone.
+    var shownUserId by remember { mutableStateOf<String?>(null) }
+    LaunchedEffect(lastUserId) {
+        if (lastUserIndex < 0) return@LaunchedEffect
+        if (shownUserId == null) {
+            listState.scrollToItem(state.messages.size + 1)
+        } else if (shownUserId != lastUserId) {
+            listState.animateScrollToItem(lastUserIndex)
+        }
+        shownUserId = lastUserId
+    }
 }
+
+private const val NOTICE_KEY = "notice"
 
 @Composable
 private fun UserBubble(text: String) {
